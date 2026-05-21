@@ -281,6 +281,23 @@
     <div class="mood-name" id="moodName">—</div>
     <div class="mood-sub" id="moodSub">drag yourself to introspect</div>
   </div>
+
+  <!-- SUBMIT -->
+  <button id="submitBtn" style="
+    margin-top: 28px;
+    padding: 12px 36px;
+    background: #ffffff15;
+    color: #fff;
+    border: 2px solid #ffffff30;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: background 0.2s;
+  ">Submit</button>
+  <div id="submitMsg" style="margin-top: 10px; font-size: 0.85rem; color: transparent; font-family: 'Nunito', sans-serif;"></div>
 </div>
 
 <script>
@@ -478,6 +495,44 @@ trackWrapper.addEventListener('click', e => {
 });
 
 init();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  emailjs.init("3xnQMqzCqBNsmWr0Y");
+
+  const submitBtn = document.getElementById("submitBtn");
+  const submitMsg = document.getElementById("submitMsg");
+
+  submitBtn.addEventListener("click", () => {
+    const moodName = document.getElementById("moodName").textContent;
+    const moodSub  = document.getElementById("moodSub").textContent;
+    const date     = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+    if (moodName === "—") {
+      submitMsg.textContent = "Drag the slider first.";
+      submitMsg.style.color = "#e74c3c";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+
+    emailjs.send("service_e39q4bf", "template_wx9d5tr", {
+      mood: moodName,
+      subtext: moodSub,
+      date: date
+    }).then(() => {
+      submitBtn.textContent = "Sent!";
+      submitMsg.textContent = "Rating received.";
+      submitMsg.style.color = "#2ecc71";
+    }).catch(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit";
+      submitMsg.textContent = "Something went wrong. Try again.";
+      submitMsg.style.color = "#e74c3c";
+    });
+  });
 </script>
 </body>
 </html>
